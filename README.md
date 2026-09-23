@@ -22,11 +22,11 @@
 
 ## What This Does
 
-<!-- Three or four sentences. Which corpus you picked, and the kinds of
-     questions your system answers. Write it for someone who has never seen
-     this repo.
-
-     Milestone 5. -->
+The Unofficial Guide makes short campus-life posts searchable through plain
+questions. This project uses the `campus_life` corpus, which covers housing,
+dining, courses, registration, and other student experiences. It retrieves the
+most relevant document chunks, refuses questions that fall outside the corpus,
+and asks the model to answer from the retrieved text while naming its source.
 
 ## Chunking Strategy
 
