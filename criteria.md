@@ -26,6 +26,10 @@ contains the answer.
 <!-- e.g. "One of my questions is about a topic only two documents mention, so
      I expect that one to be hard." -->
 
+I chose 4 of 5 because the five questions cover short, concrete facts, but one
+retrieval can still miss when similar housing or dining documents are ranked
+above the document that contains the answer.
+
 ---
 
 ## 2. Every answer names a source
@@ -35,6 +39,10 @@ Every answer the system produces names at least one source document.
 **Why this target:**
 <!-- Why all five and not four? What about your setup makes that achievable —
      or what would have to go wrong for it not to be? -->
+
+I chose all five because the answer format already includes retrieved source
+filenames, so naming a source should be a normal part of every successful
+response. A missing source would indicate a pipeline or formatting failure.
 
 ---
 
@@ -53,6 +61,10 @@ in at least 4 of 5 tries.
 <!-- What did your distances look like when you set the cutoff in Milestone 4?
      Was there a clean gap, or did the two groups overlap? -->
 
+I chose 4 of 5 because the out-of-scope questions are unrelated to campus life,
+but an embedding match can still be misleading for one question. The gate
+should refuse the clearly unrelated majority without requiring perfection.
+
 ---
 
 ## 4. Something about your chunks
@@ -69,11 +81,16 @@ in at least 4 of 5 tries.
        - "No chunk is shorter than 200 characters, since anything below that
           in my corpus turned out to be a heading with no content under it." -->
 
+At least 4 of 5 sampled chunks should read as a complete thought, with no
+sentence cut in half at either end.
+
 
 
 **Why this target:**
 
-
+The campus_life documents are short posts of one to three paragraphs, so a
+chunk should usually preserve a whole answer. I allow one imperfect chunk
+because the automatic splitter may still cut a longer post at a boundary.
 
 ---
 
@@ -87,11 +104,16 @@ in at least 4 of 5 tries.
      present — anything, as long as it names a number or an observable
      outcome. -->
 
-
+For at least 4 of 5 in-corpus questions, the generated answer should include
+the expected phrase in `questions.py` and name the document that contains the
+answer.
 
 **Why this target:**
 
-
+The guide is useful only when it gives the specific fact the student asked for
+and attributes that fact to the right document. I chose 4 of 5 because one
+question could be phrased differently by the model even when the retrieved
+evidence is correct.
 
 ---
 
