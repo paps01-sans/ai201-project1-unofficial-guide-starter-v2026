@@ -100,9 +100,11 @@ The good: cheapest housing tier by about $900 a year, and the singles are real s
 <!-- One complete question and answer, pasted as text, with the source line
      visible. Milestone 4. -->
 
-**Question:**
+**Question:** Is the housing lottery random for juniors and seniors?
 
-**Answer:**
+**Answer:** No, for juniors and seniors, the housing lottery orders students by
+accumulated credit hours first, and only uses a random tie-break
+(`admin_housing_lottery.txt`).
 
 ```
 
@@ -119,9 +121,24 @@ The good: cheapest housing tier by about $900 a year, and the singles are real s
 
      Milestone 4. -->
 
-| Question | In corpus? | Best distance |
-| -------- | ---------- | ------------- |
-|          |            |               |
+| Question                                                                | In corpus? | Best distance |
+| ----------------------------------------------------------------------- | ---------- | ------------- |
+| Is the housing lottery random for juniors and seniors?                  | Yes        | 0.1355        |
+| How long are the peak lunch wait times at Pellew Dining Hall?           | Yes        | 0.1725        |
+| How many hours per week should students expect to spend outside CS 210? | Yes        | 0.2846        |
+| How much does laundry cost in Aldridge Hall?                            | Yes        | 0.2585        |
+| Which floors in Aldridge Hall are quiet floors?                         | Yes        | 0.2500        |
+| What is the capital of Mongolia?                                        | No         | 0.7873        |
+| How do I change the oil in a diesel engine?                             | No         | 0.9228        |
+| Who won the 1994 World Cup?                                             | No         | 0.8474        |
+| What is the recommended dosage of ibuprofen for a headache?             | No         | 0.8243        |
+| How do I write a for loop in Rust?                                      | No         | 0.8768        |
+
+**My cutoff:** 0.6. The in-corpus questions ranged from 0.1355 to 0.2846,
+while the out-of-corpus questions ranged from 0.7873 to 0.9228. I kept the
+starter cutoff because it sits comfortably in the gap and rejects the clearly
+unrelated questions. I kept `TOP_K = 5` because the relevant chunk appeared
+in the first five results for each inspected question.
 
 ## How I Used AI
 
