@@ -151,9 +151,19 @@ in the first five results for each inspected question.
 
      Milestone 5. -->
 
-**1.**
+**1.** I asked Copilot to inspect the `campus_life` documents and recommend a
+chunking strategy that matched their structure. It identified that every
+document has multiple short paragraphs and suggested keeping paragraph
+boundaries instead of using the starter's fixed 800-character windows. I
+implemented paragraph-based chunks with a 400-character maximum, zero overlap,
+and the document title attached to the first content paragraph.
 
-**2.**
+**2.** I asked Copilot to evaluate retrieval distances for all five in-corpus
+questions and the five out-of-scope questions, then inspect the grounding
+prompt. It found a clear distance gap between 0.2846 for the hardest in-scope
+question and 0.7873 for the closest out-of-scope question. I kept the 0.6
+cutoff and tightened the prompt so the model cannot infer from general
+knowledge or cite a document that does not support its answer.
 
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
