@@ -170,6 +170,16 @@ knowledge or cite a document that does not support its answer.
      claims earns nothing.
      ───────────────────────────────────────────────────────────────────────── -->
 
+**Stretch feature:** Metadata filtering by source filename. I am adding a
+`--source FILENAME` option to `retrieve` and `ask` so a user can narrow
+retrieval to one document before the relevance gate and answer generation.
+The corpus has no reliable dates, so this feature filters by source only.
+
+For example, `python app.py retrieve "Is the housing lottery random for
+juniors and seniors?" --source admin_housing_lottery.txt` returns only the
+matching housing-lottery chunk. An unknown source returns no chunks instead of
+silently searching the whole corpus.
+
 ---
 
 # Unit 2

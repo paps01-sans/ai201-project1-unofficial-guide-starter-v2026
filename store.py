@@ -183,6 +183,7 @@ def search(
     top_k: int | None = None,
     corpus: str | None = None,
     variant: str = "default",
+    source: str | None = None,
 ) -> list[Result]:
     """
     Retrieve the chunks closest in meaning to a question.
@@ -202,6 +203,7 @@ def search(
     raw = collection.query(
         query_embeddings=embed([question]),
         n_results=min(top_k, collection.count()),
+        where={"source": source} if source else None,
     )
 
     results: list[Result] = []
