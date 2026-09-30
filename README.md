@@ -325,6 +325,21 @@ Floors 3 and 4 in Aldridge Hall are quiet floors. (housing_aldridge_hall_noise.t
 
      Milestone 3. -->
 
+I missed nothing in the before run. There is therefore no failed question or
+pipeline stage to diagnose: the loading stage supplied the campus_life
+documents, the paragraph chunker produced complete sampled thoughts, and
+embedding and retrieval returned answer-containing chunks for all five
+questions. Generation then included the expected phrase and a source filename
+in every one of the 15 answers. The gate also refused all five out-of-scope
+questions, so there is no failure pattern across the five stages.
+
+The targets were somewhat safe. I would tighten criterion 1 from "at least 4
+of 5" to "5 of 5" because every test question has a concrete answer in this
+corpus and the current retrieval evidence reached 5/5 in all three runs. I
+would keep criterion 2 at 5 of 5 because it already requires perfection. The
+other 4-of-5 targets are reasonable tolerance targets for generation and gate
+behavior, but this result does not prove they would hold on a new question set.
+
 ## The Improvement
 
 **What I changed:**
