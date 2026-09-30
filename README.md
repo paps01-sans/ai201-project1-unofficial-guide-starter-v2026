@@ -200,17 +200,91 @@ silently searching the whole corpus.
 
      Milestone 1. -->
 
-| Criterion                              | Target | Run 1 | Run 2 | Run 3 | Verdict |
-| -------------------------------------- | ------ | ----- | ----- | ----- | ------- |
-| 1. Retrieved chunk contains the answer | 4 of 5 |       |       |       |         |
-| 2. Every answer names a source         | 5 of 5 |       |       |       |         |
-| 3. Gate stops out-of-corpus questions  | 4 of 5 |       |       |       |         |
-| 4.                                     |        |       |       |       |         |
-| 5.                                     |        |       |       |       |         |
+| Criterion                                       | Target | Run 1 | Run 2 | Run 3 | Verdict |
+| ----------------------------------------------- | ------ | ----- | ----- | ----- | ------- |
+| 1. Retrieved chunk contains the answer          | 4 of 5 | 5/5   | 5/5   | 5/5   | MET     |
+| 2. Every answer names a source                  | 5 of 5 | 5/5   | 5/5   | 5/5   | MET     |
+| 3. Gate stops out-of-corpus questions           | 4 of 5 | 5/5   | 5/5   | 5/5   | MET     |
+| 4. Sampled chunks are complete thoughts         | 4 of 5 | 5/5   | 5/5   | 5/5   | MET     |
+| 5. Expected phrase and supporting source appear | 4 of 5 | 5/5   | 5/5   | 5/5   | MET     |
 
 <!-- Underneath, paste the REAL output for each criterion from one of your
      runs — the actual text your system produced, not a description of it.
      Name the file and function that produced it. -->
+
+### Criterion 1: Retrieved chunk contains the answer
+
+Evidence from `results/run_2026-09-30_1504_before.md`, produced by
+`run_eval.py::run_once` using `store.py::search`:
+
+```
+No, juniors and seniors are ordered by accumulated credit hours first, and they are only tie-broken randomly (admin_housing_lottery.txt).
+The peak lunch wait times at Pellew Dining Hall are 12 to 18 minutes (dining_pellew_dining_hall.txt and dining_pellew_dining_hall_followup.txt).
+Students should expect to spend 8 to 10 hours a week outside class for CS 210 (course_cs_210.txt and course_cs_210_workload.txt).
+Laundry in Aldridge Hall costs $1.75 for a wash and $1.50 for a dry (housing_aldridge_hall_laundry.txt and housing_aldridge_hall.txt).
+Floors 3 and 4 in Aldridge Hall are quiet floors. (housing_aldridge_hall_noise.txt)
+```
+
+### Criterion 2: Every answer names a source
+
+Evidence from `results/run_2026-09-30_1504_before.md`, produced by
+`run_eval.py::run_once` and `generate.py::answer_from_chunks`:
+
+```
+(admin_housing_lottery.txt)
+(dining_pellew_dining_hall.txt and dining_pellew_dining_hall_followup.txt)
+(course_cs_210.txt and course_cs_210_workload.txt)
+(housing_aldridge_hall_laundry.txt and housing_aldridge_hall.txt)
+(housing_aldridge_hall_noise.txt)
+```
+
+### Criterion 3: Gate stops out-of-corpus questions
+
+Evidence from `results/run_2026-09-30_1504_before.md`, produced by
+`run_eval.py::check_out_of_scope` using `gate.py::check`:
+
+```
+What is the capital of Mongolia? | 0.787 | refused
+How do I change the oil in a diesel engine? | 0.923 | refused
+Who won the 1994 World Cup? | 0.847 | refused
+What is the recommended dosage of ibuprofen for a headache? | 0.824 | refused
+How do I write a for loop in Rust? | 0.877 | refused
+-> gate refused 5 of 5
+```
+
+### Criterion 4: Sampled chunks are complete thoughts
+
+Evidence from the five chunks printed in this README's Unit 1 sample, produced
+by `chunker.py::split_documents`:
+
+```
+On the add/drop deadline
+
+You can add a course through the end of the second week. Dropping is a longer window — through the end of week six — but a drop after week two shows as a W on your transcript. Nothing anywhere on the registrar's site says this plainly, and students find out from each other.
+
+Start the term project in week three, not week eight; everyone learns this the hard way.
+
+Workload for PHYS 130 Mechanics
+
+People keep asking so: 7 hours a week, plus 3 on lab weeks. That's real time, not optimistic time.
+
+Also worth saying: one register, so the queue is a single line no matter how busy. Nobody tells you this at orientation.
+
+The good: cheapest housing tier by about $900 a year, and the singles are real singles.
+```
+
+### Criterion 5: Expected phrase and supporting source appear
+
+Evidence from `results/run_2026-09-30_1504_before.md`, produced by
+`run_eval.py::run_once` and `generate.py::answer_from_chunks`:
+
+```
+No, juniors and seniors are ordered by accumulated credit hours first, and they are only tie-broken randomly (admin_housing_lottery.txt).
+The peak lunch wait times at Pellew Dining Hall are 12 to 18 minutes (dining_pellew_dining_hall.txt and dining_pellew_dining_hall_followup.txt).
+Students should expect to spend 8 to 10 hours a week outside class for CS 210 (course_cs_210.txt and course_cs_210_workload.txt).
+Laundry in Aldridge Hall costs $1.75 for a wash and $1.50 for a dry (housing_aldridge_hall_laundry.txt and housing_aldridge_hall.txt).
+Floors 3 and 4 in Aldridge Hall are quiet floors. (housing_aldridge_hall_noise.txt)
+```
 
 ## Verdicts
 
