@@ -297,13 +297,13 @@ Floors 3 and 4 in Aldridge Hall are quiet floors. (housing_aldridge_hall_noise.t
 
      Milestone 2. -->
 
-| #   | Criterion | Verdict | How I decided |
-| --- | --------- | ------- | ------------- |
-| 1   |           |         |               |
-| 2   |           |         |               |
-| 3   |           |         |               |
-| 4   |           |         |               |
-| 5   |           |         |               |
+| #   | Criterion                                    | Verdict | How I decided                                                                                                                                            |
+| --- | -------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Retrieved chunk contains the answer          | MET     | Each of the three runs had the expected answer in the retrieved evidence for all five questions, so 5/5 met the target of at least 4/5 every time.       |
+| 2   | Every answer names a source                  | MET     | All 15 generated answers included at least one source filename, so every run reached 5/5 against the target of 5/5.                                      |
+| 3   | Gate stops out-of-corpus questions           | MET     | The deterministic gate refused all five out-of-corpus questions, so its 5/5 result exceeded the target of at least 4/5 in each run column.               |
+| 4   | Sampled chunks are complete thoughts         | MET     | All five sampled chunks read as complete thoughts without a sentence cut off at either end, meeting the target of at least 4/5.                          |
+| 5   | Expected phrase and supporting source appear | MET     | Every generated answer contained its expected phrase and named the supporting document, giving 5/5 in all three runs against the target of at least 4/5. |
 
 ## Diagnoses
 
