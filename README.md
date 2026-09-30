@@ -31,16 +31,7 @@ and asks the model to answer from the retrieved text while naming its source.
 ## Chunking Strategy
 
 **Chunk size:** 400 characters maximum
-**What I changed:** I added BM25 keyword ranking to `store.py::search` and
-combined it with the existing semantic ranking using reciprocal rank fusion.
-The original semantic distance is still used by the relevance gate.
 **Overlap:** 0 characters
-
-**Why I picked it:** The before run missed nothing, but criterion 1 was the
-safest target and the questions include exact names, numbers, and terms such
-as "CS 210" and "$1.75". Hybrid retrieval directly tests whether keyword
-matching makes those exact facts easier to retrieve without changing chunking,
-generation, or the cutoff.
 
 <!-- What about YOUR documents made you pick these numbers? Short posts and
      long sectioned guides don't want the same chunking, and "800 seemed
@@ -166,12 +157,12 @@ boundaries instead of using the starter's fixed 800-character windows. I
 implemented paragraph-based chunks with a 400-character maximum, zero overlap,
 and the document title attached to the first content paragraph.
 
-**2.** I asked Copilot to evaluate retrieval distances for all five in-corpus
-questions and the five out-of-scope questions, then inspect the grounding
-prompt. It found a clear distance gap between 0.2846 for the hardest in-scope
-question and 0.7873 for the closest out-of-scope question. I kept the 0.6
-cutoff and tightened the prompt so the model cannot infer from general
-knowledge or cite a document that does not support its answer.
+**2.** I asked Copilot to compare the before-run results and suggest one fix
+that matched the evidence. It noticed that the test questions use exact names,
+numbers, and course terms, so I added BM25 keyword ranking beside semantic
+search in `store.py::search`. After the change, the exact laundry source moved
+to the top of the results, but the overall scores stayed the same because the
+before run was already 5/5.
 
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
@@ -427,9 +418,24 @@ retrieved enough evidence, so the measured verdicts stayed the same.
 
      Milestone 5. -->
 
+None of the five criteria are still missed. The main limitation is that the
+test set is small, so passing 5/5 does not prove the system will work for every
+campus question. I would test more questions, especially ones with uncommon
+names or numbers, to see if the hybrid search helps outside this set. I also
+would compare the keyword and semantic rankings on those new questions before
+changing the cutoff or adding another fix. I stopped here because the required
+before and after tests both met every target, and I was only supposed to make
+one improvement.
+
 ## What I'd Do Differently
 
 <!-- Knowing what you know now — which of your five criteria would you write
      differently, and why?
 
      Milestone 5. -->
+
+Next time I would make criterion 1 stricter and require 5 of 5 instead of 4 of 5. All five questions had clear answers in the corpus, so 4 of 5 was probably
+too easy for this test set. I would also write criterion 4 with a bigger,
+specified sample instead of only five chunks, since five chunks can make the
+chunking result look better than it really is. The other criteria still made
+sense, but I would test them with more questions before trusting the results.
