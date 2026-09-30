@@ -18,6 +18,7 @@ rest of the project if they were wrong:
 """
 
 import os
+import re
 import shutil
 from dataclasses import dataclass
 
@@ -28,6 +29,7 @@ from dataclasses import dataclass
 os.environ.setdefault("ANONYMIZED_TELEMETRY", "False")
 
 import chromadb  # noqa: E402
+from rank_bm25 import BM25Okapi
 
 import config
 from chunker import Chunk
@@ -200,21 +202,62 @@ def search(
             f"No index called '{name}'. Run `python app.py index` first."
         ) from exc
 
+    count = collection.count()
     raw = collection.query(
         query_embeddings=embed([question]),
-        n_results=min(top_k, collection.count()),
+        n_results=min(top_k, count),
         where={"source": source} if source else None,
     )
 
+    semantic = {
+        f"{meta.get('source', 'unknown')}#{meta.get('index', 0)}": (text, meta, distance)
+        for text, meta, distance in zip(
+            raw["documents"][0], raw["metadatas"][0], raw["distances"][0]
+        )
+    }
+
+    all_rows = collection.get(
+        include=["documents", "metadatas"],
+        where={"source": source} if source else None,
+    )
+    documents = all_rows["documents"] or []
+    metadatas = all_rows["metadatas"] or []
+    tokens = lambda text: re.findall(r"[a-z0-9]+", text.lower())
+    bm25 = BM25Okapi([tokens(document) for document in documents])
+    keyword_scores = bm25.get_scores(tokens(question))
+    keyword_order = sorted(
+        range(len(documents)), key=lambda index: keyword_scores[index], reverse=True
+    )
+    keyword_rank = {
+        f"{meta.get('source', 'unknown')}#{meta.get('index', 0)}": rank
+        for rank, meta in enumerate((metadatas[index] for index in keyword_order))
+    }
+    semantic_order = list(semantic)
+    semantic_rank = {label: rank for rank, label in enumerate(semantic_order)}
+
+    labels = set(semantic_rank) | set(keyword_rank)
+    ranked = sorted(
+        labels,
+        key=lambda label: (
+            1 / (60 + semantic_rank.get(label, len(labels)))
+            + 1 / (60 + keyword_rank.get(label, len(labels)))
+        ),
+        reverse=True,
+    )[:top_k]
+
+    rows_by_label = {
+        f"{meta.get('source', 'unknown')}#{meta.get('index', 0)}": (text, meta)
+        for text, meta in zip(documents, metadatas)
+    }
     results: list[Result] = []
-    for text, meta, distance in zip(
-        raw["documents"][0], raw["metadatas"][0], raw["distances"][0]
-    ):
+    for label in ranked:
+        text, meta = rows_by_label[label]
+        distance = semantic.get(label, (text, meta, 1.0))[2]
         results.append(
             Result(
                 text=text,
                 source=str(meta.get("source", "unknown")),
-                label=f"{meta.get('source', 'unknown')}#{meta.get('index', 0)}",
+                label=label,
                 distance=float(distance),
                 produced_by=str(meta.get("produced_by", "unknown")),
             )

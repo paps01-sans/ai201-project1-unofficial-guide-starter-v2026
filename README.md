@@ -31,7 +31,16 @@ and asks the model to answer from the retrieved text while naming its source.
 ## Chunking Strategy
 
 **Chunk size:** 400 characters maximum
+**What I changed:** I added BM25 keyword ranking to `store.py::search` and
+combined it with the existing semantic ranking using reciprocal rank fusion.
+The original semantic distance is still used by the relevance gate.
 **Overlap:** 0 characters
+
+**Why I picked it:** The before run missed nothing, but criterion 1 was the
+safest target and the questions include exact names, numbers, and terms such
+as "CS 210" and "$1.75". Hybrid retrieval directly tests whether keyword
+matching makes those exact facts easier to retrieve without changing chunking,
+generation, or the cutoff.
 
 <!-- What about YOUR documents made you pick these numbers? Short posts and
      long sectioned guides don't want the same chunking, and "800 seemed
@@ -58,7 +67,6 @@ paragraph, and zero overlap avoids repeating complete paragraph boundaries.
 
      `python app.py chunks -n 5` prints all three for you. Copy them straight
      across.
-
      Milestone 3. -->
 
 **Chunk 1** — source: `admin_add_drop_deadline.txt#0` — produced by: `chunker.py::split_documents`
@@ -342,9 +350,15 @@ behavior, but this result does not prove they would hold on a new question set.
 
 ## The Improvement
 
-**What I changed:**
+**What I changed:** I added BM25 keyword ranking to `store.py::search` and
+combined it with the existing semantic ranking using reciprocal rank fusion.
+The original semantic distance is still used by the relevance gate.
 
-**Why I picked it:**
+**Why I picked it:** The before run missed nothing, but criterion 1 was the
+safest target and the questions include exact names, numbers, and terms such
+as "CS 210" and "$1.75". Hybrid retrieval tests whether keyword matching
+makes those exact facts easier to retrieve without changing chunking,
+generation, or the cutoff.
 
 <!-- Connect it to a specific diagnosis above in one sentence. If you can't,
      you picked a fix because it sounded impressive. -->
@@ -354,13 +368,38 @@ behavior, but this result does not prove they would hold on a new question set.
 <!-- Same format, same five criteria, three runs each.
      `python run_eval.py --label after` -->
 
-| Criterion                              | Target | Run 1 | Run 2 | Run 3 | Verdict |
-| -------------------------------------- | ------ | ----- | ----- | ----- | ------- |
-| 1. Retrieved chunk contains the answer | 4 of 5 |       |       |       |         |
-| 2. Every answer names a source         | 5 of 5 |       |       |       |         |
-| 3. Gate stops out-of-corpus questions  | 4 of 5 |       |       |       |         |
-| 4.                                     |        |       |       |       |         |
-| 5.                                     |        |       |       |       |         |
+| Criterion                                       | Target | Run 1 | Run 2 | Run 3 | Verdict |
+| ----------------------------------------------- | ------ | ----- | ----- | ----- | ------- |
+| 1. Retrieved chunk contains the answer          | 4 of 5 | 5/5   | 5/5   | 5/5   | MET     |
+| 2. Every answer names a source                  | 5 of 5 | 5/5   | 5/5   | 5/5   | MET     |
+| 3. Gate stops out-of-corpus questions           | 4 of 5 | 5/5   | 5/5   | 5/5   | MET     |
+| 4. Sampled chunks are complete thoughts         | 4 of 5 | 5/5   | 5/5   | 5/5   | MET     |
+| 5. Expected phrase and supporting source appear | 4 of 5 | 5/5   | 5/5   | 5/5   | MET     |
+
+After-run evidence from `results/run_2026-09-30_1624_after.md`, produced by
+`run_eval.py::run_once`, `run_eval.py::check_out_of_scope`, and
+`generate.py::answer_from_chunks`:
+
+```
+Is the housing lottery random for juniors and seniors? | pass | pass | pass
+How long are the peak lunch wait times at Pellew Dining Hall? | pass | pass | pass
+How many hours per week should students expect to spend outside CS 210? | pass | pass | pass
+How much does laundry cost in Aldridge Hall? | pass | pass | pass
+Which floors in Aldridge Hall are quiet floors? | pass | pass | pass
+
+What is the capital of Mongolia? | 0.787 | refused
+How do I change the oil in a diesel engine? | 0.923 | refused
+Who won the 1994 World Cup? | 0.847 | refused
+What is the recommended dosage of ibuprofen for a headache? | 0.824 | refused
+How do I write a for loop in Rust? | 0.877 | refused
+-> gate refused 5 of 5
+
+No, juniors and seniors are ordered by accumulated credit hours first, and only tie-break randomly (admin_housing_lottery.txt).
+The peak lunch wait times at Pellew Dining Hall are 12 to 18 minutes. (dining_pellew_dining_hall.txt)
+Students should expect to spend 8 to 10 hours a week outside class for CS 210 (course_cs_210.txt, course_cs_210_workload.txt).
+Laundry in Aldridge Hall costs $1.75 to wash and $1.50 to dry (housing_aldridge_hall_laundry.txt and housing_aldridge_hall.txt).
+The quiet floors in Aldridge Hall are floors 3 and 4 (housing_aldridge_hall_noise.txt).
+```
 
 **Did it help?**
 
@@ -370,6 +409,13 @@ behavior, but this result does not prove they would hold on a new question set.
      tell.
 
      Milestone 4. -->
+
+It preserved the existing results but did not improve the aggregate scores:
+the before and after evaluations were both 5/5 for every criterion in all
+three runs, and both gate checks refused 5/5 out-of-scope questions. It did
+improve the retrieval ordering for the laundry question by putting the exact
+`housing_aldridge_hall_laundry.txt` source first, but the baseline already
+retrieved enough evidence, so the measured verdicts stayed the same.
 
 ## What's Still Broken
 
